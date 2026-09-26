@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
+  <meta name="theme-color" content="#0b0a10" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Echo" />
+  <title>Echo — Discover the soundtrack around you</title>
+  <style>
+    :root{
+      --bg:#0b0a10; --card:#14121d; --card2:#1a1724; --text:#f7f4ff; --muted:#9e97ad;
+      --purple:#a879ff; --purple2:#6f5cff; --cyan:#68e5ff; --line:rgba(255,255,255,.085);
+      --shadow:0 18px 50px rgba(0,0,0,.34); --safe-top:env(safe-area-inset-top); --safe-bottom:env(safe-area-inset-bottom);
+    }
+    *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+    html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",system-ui,sans-serif;min-height:100%;}
+    body{overflow-x:hidden}
+    button,a{font:inherit}
+    .app{min-height:100dvh; max-width:520px; margin:0 auto; position:relative; padding:calc(var(--safe-top) + 14px) 18px calc(92px + var(--safe-bottom));}
+    .topbar{display:flex;align-items:center;justify-content:space-between;margin:5px 0 10px}
+    .logo{font-size:27px;font-weight:800;letter-spacing:-1.1px}.logo span{color:var(--purple)}
+    .iconbtn{height:38px;width:38px;border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.04);color:var(--text);display:grid;place-items:center;cursor:pointer}
+    .kicker{color:var(--muted);font-size:14px;margin-top:1px;line-height:1.35}
+    .section{margin-top:25px}
+    .section-head{display:flex;align-items:end;justify-content:space-between;margin-bottom:12px}
+    .section-title{font-size:18px;font-weight:700;letter-spacing:-.3px}.section-meta{font-size:12px;color:var(--muted)}
+
+    .orb-wrap{height:318px;display:grid;place-items:center;position:relative;overflow:hidden;margin-top:4px}
+    .ambient{position:absolute;width:330px;height:330px;border-radius:50%;background:radial-gradient(circle,rgba(168,121,255,.14),rgba(104,229,255,.035) 48%,transparent 70%);filter:blur(7px);animation:pulse 6s ease-in-out infinite}
+    .orb{width:208px;height:208px;border-radius:50%;position:relative;display:grid;place-items:center;background:linear-gradient(145deg,rgba(168,121,255,.19),rgba(23,19,34,.82) 42%,rgba(104,229,255,.12));border:1px solid rgba(255,255,255,.12);box-shadow:inset 0 0 45px rgba(168,121,255,.12),0 0 65px rgba(111,92,255,.12);overflow:hidden}
+    .orb::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(120deg,rgba(255,255,255,.09),transparent 30%,transparent 70%,rgba(104,229,255,.05));pointer-events:none}
+    .wave{position:absolute;left:-24px;width:260px;height:62px;border-radius:48%;border-top:2px solid rgba(168,121,255,.55);transform:rotate(-5deg);animation:wave 5s linear infinite}
+    .wave.w1{top:72px}.wave.w2{top:112px;animation-duration:7s;animation-direction:reverse;border-color:rgba(104,229,255,.42);transform:rotate(7deg)}
+    .orb-count{position:relative;z-index:2;text-align:center;margin-top:4px}.orb-count strong{display:block;font-size:52px;line-height:.95;letter-spacing:-2.6px}.orb-count span{display:block;color:#d7d0e5;font-size:13px;margin-top:7px}
+    .dot{position:absolute;width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.78);box-shadow:0 0 12px rgba(255,255,255,.3);animation:float 5s ease-in-out infinite}
+    .dot.hot{background:var(--purple);box-shadow:0 0 14px rgba(168,121,255,.6);width:9px;height:9px}
+    @keyframes pulse{0%,100%{transform:scale(.95);opacity:.8}50%{transform:scale(1.06);opacity:1}}
+    @keyframes wave{0%{transform:translateX(-12px) rotate(-5deg)}50%{transform:translateX(12px) rotate(2deg)}100%{transform:translateX(-12px) rotate(-5deg)}}
+    @keyframes float{0%,100%{transform:translateY(0) scale(1);opacity:.65}50%{transform:translateY(-7px) scale(1.08);opacity:1}}
+
+    .signal-card{display:flex;gap:12px;align-items:center;background:linear-gradient(110deg,rgba(168,121,255,.16),rgba(104,229,255,.07));border:1px solid rgba(168,121,255,.24);border-radius:18px;padding:13px 14px;box-shadow:var(--shadow)}
+    .signal-icon{width:39px;height:39px;border-radius:13px;background:rgba(168,121,255,.17);display:grid;place-items:center;color:#d9c6ff;font-size:19px;flex:0 0 auto}
+    .signal-card b{display:block;font-size:14px}.signal-card p{margin:3px 0 0;font-size:12px;color:#b7aec7;line-height:1.35}
+
+    .tracks{display:flex;flex-direction:column;gap:9px}
+    .track{display:grid;grid-template-columns:48px 1fr auto;gap:12px;align-items:center;border:1px solid var(--line);background:rgba(255,255,255,.025);border-radius:17px;padding:9px 11px 9px 9px;cursor:pointer;transition:.15s ease}
+    .track:active{transform:scale(.985);background:rgba(255,255,255,.05)}
+    .art{height:48px;width:48px;border-radius:12px;display:grid;place-items:center;font-weight:800;color:rgba(255,255,255,.93);font-size:13px;box-shadow:inset 0 0 22px rgba(255,255,255,.07)}
+    .art.a{background:linear-gradient(145deg,#fe7d6a,#7d3f9f)} .art.b{background:linear-gradient(145deg,#43456a,#111225)}
+    .art.c{background:linear-gradient(145deg,#63a9a8,#2f3a4d)} .art.d{background:linear-gradient(145deg,#d89d55,#5b3f33)}
+    .track-main{min-width:0}.track-title{font-size:14px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.track-artist{font-size:12px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .count{font-size:11px;color:#c9c0d8;background:rgba(255,255,255,.055);padding:6px 8px;border-radius:999px;white-space:nowrap}
+
+    .mine{background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(168,121,255,.055));border:1px solid var(--line);border-radius:20px;padding:14px;display:grid;grid-template-columns:56px 1fr auto;gap:12px;align-items:center}
+    .mine .art{width:56px;height:56px}.mine-label{font-size:10px;text-transform:uppercase;letter-spacing:.11em;color:#a79caf;margin-bottom:5px}.ghost{border:0;background:transparent;color:#cbb8f9;padding:8px 4px;font-size:12px;cursor:pointer}
+
+    .nav{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(520px,100%);height:calc(72px + var(--safe-bottom));padding:8px 18px var(--safe-bottom);background:linear-gradient(to top,rgba(11,10,16,.99),rgba(11,10,16,.94));border-top:1px solid var(--line);backdrop-filter:blur(16px);z-index:30;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+    .nav button{border:0;background:transparent;color:#746d82;border-radius:14px;font-size:11px;display:flex;flex-direction:column;gap:5px;align-items:center;justify-content:center;cursor:pointer}.nav button.active{color:#d8c7ff;background:rgba(168,121,255,.08)} .nav svg{width:20px;height:20px}
+
+    .page{display:none}.page.active{display:block}
+    .echo-list{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+    .echo-item{padding:14px;border-radius:17px;border:1px solid var(--line);background:rgba(255,255,255,.025);display:flex;gap:12px}.echo-pulse{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 38% 35%,#ccb7ff,var(--purple2));box-shadow:0 0 24px rgba(168,121,255,.23);flex:0 0 auto}.echo-item b{font-size:13px}.echo-item p{font-size:12px;color:var(--muted);margin:4px 0 0}.empty{padding:28px 18px;text-align:center;color:var(--muted);font-size:13px;border:1px dashed var(--line);border-radius:18px}
+    .settings-card{border:1px solid var(--line);background:rgba(255,255,255,.025);border-radius:18px;padding:15px;margin-top:12px}.settings-row{display:flex;justify-content:space-between;gap:12px;align-items:center}.settings-row+.settings-row{border-top:1px solid var(--line);margin-top:13px;padding-top:13px}.settings-row b{font-size:13px}.settings-row small{display:block;color:var(--muted);font-size:11px;margin-top:3px}.toggle{width:47px;height:28px;border-radius:999px;background:#3b3547;position:relative;border:0;cursor:pointer}.toggle::after{content:"";position:absolute;width:22px;height:22px;border-radius:50%;left:3px;top:3px;background:white;transition:.2s}.toggle.on{background:var(--purple2)}.toggle.on::after{left:22px}
+
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.56);backdrop-filter:blur(11px);z-index:80;display:none;align-items:flex-end;justify-content:center}.overlay.show{display:flex}.sheet{width:min(520px,100%);max-height:90dvh;border-radius:28px 28px 0 0;background:#111019;border:1px solid var(--line);padding:13px 18px calc(24px + var(--safe-bottom));box-shadow:0 -28px 80px rgba(0,0,0,.42);animation:sheetup .25s ease-out}
+    @keyframes sheetup{from{transform:translateY(24px);opacity:.6}to{transform:none;opacity:1}}
+    .handle{width:38px;height:4px;border-radius:999px;background:#48434f;margin:0 auto 18px}.sheet-art{height:210px;border-radius:24px;background:linear-gradient(145deg,#525a73,#1d1c2b 55%,#58417c);display:grid;place-items:center;margin-bottom:18px;position:relative;overflow:hidden}.sheet-art::before,.sheet-art::after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;border:1px solid rgba(255,255,255,.11)}.sheet-art::after{width:95px;height:95px}.sheet-art span{font-size:44px;font-weight:800;letter-spacing:-2px;z-index:2}.sheet h2{font-size:24px;letter-spacing:-.6px;margin:0}.sheet .artist{font-size:14px;color:var(--muted);margin:5px 0 0}.proximity{font-size:12px;color:#c8bfd5;margin:14px 0 18px;display:flex;gap:7px;align-items:center}.proximity i{width:7px;height:7px;border-radius:50%;background:var(--purple);box-shadow:0 0 10px var(--purple)}
+    .primary{width:100%;height:52px;border:0;border-radius:16px;color:white;font-weight:700;background:linear-gradient(120deg,var(--purple2),#8b67fa 58%,#6d9cf6);box-shadow:0 12px 30px rgba(111,92,255,.23);cursor:pointer}.secondary{width:100%;height:47px;border:1px solid var(--line);border-radius:15px;color:#dcd6e8;background:rgba(255,255,255,.035);margin-top:9px;cursor:pointer}
+
+    .onboard{position:fixed;inset:0;background:radial-gradient(circle at 50% 28%,rgba(168,121,255,.16),transparent 38%),var(--bg);z-index:100;padding:calc(var(--safe-top) + 28px) 22px calc(var(--safe-bottom) + 24px);display:none;align-items:stretch;justify-content:center}.onboard.show{display:flex}.onboard-inner{width:min(480px,100%);display:flex;flex-direction:column;min-height:100%}.ob-logo{font-size:25px;font-weight:800}.ob-stage{flex:1;display:flex;flex-direction:column;justify-content:center;text-align:center}.ob-orb{height:145px;width:145px;border-radius:50%;margin:0 auto 32px;background:radial-gradient(circle at 36% 30%,rgba(255,255,255,.19),transparent 25%),linear-gradient(145deg,rgba(168,121,255,.62),rgba(64,47,94,.8) 48%,rgba(104,229,255,.16));box-shadow:0 0 70px rgba(168,121,255,.18);display:grid;place-items:center;position:relative}.ob-orb::after{content:"";width:80px;height:2px;border-radius:999px;background:rgba(255,255,255,.75);box-shadow:0 -15px 0 rgba(255,255,255,.4),0 15px 0 rgba(255,255,255,.4);transform:rotate(-7deg)}
+    .ob-stage h1{font-size:34px;line-height:1.02;letter-spacing:-1.4px;margin:0 auto;max-width:340px}.ob-stage p{font-size:14px;line-height:1.55;color:var(--muted);max-width:325px;margin:14px auto 0}.ob-actions{margin-top:auto}.privacy-note{font-size:11px;text-align:center;color:#756e80;margin:12px 8px 0;line-height:1.45}
+
+    .toast{position:fixed;z-index:120;top:calc(var(--safe-top) + 12px);left:50%;transform:translate(-50%,-130%);width:min(calc(100% - 28px),490px);padding:13px 14px;border-radius:18px;background:rgba(27,24,38,.96);border:1px solid rgba(168,121,255,.28);box-shadow:0 16px 50px rgba(0,0,0,.38);display:flex;gap:12px;align-items:center;transition:.36s cubic-bezier(.2,.8,.2,1)}.toast.show{transform:translate(-50%,0)}.toast-icon{width:38px;height:38px;border-radius:13px;background:rgba(168,121,255,.16);display:grid;place-items:center;color:#ddcaff}.toast b{display:block;font-size:13px}.toast p{margin:3px 0 0;color:var(--muted);font-size:11px}
+
+    .demo-badge{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#978fa3;border:1px solid var(--line);padding:5px 7px;border-radius:999px}
+    @media(min-width:700px){body{background:#08070b}.app{border-left:1px solid var(--line);border-right:1px solid var(--line)}}
+  </style>
+</head>
+<body>
+  <div id="onboard" class="onboard show">
+    <div class="onboard-inner">
+      <div class="ob-logo">Echo<span style="color:var(--purple)">.</span></div>
+      <div class="ob-stage">
+        <div class="ob-orb"></div>
+        <h1>Discover the soundtrack around you.</h1>
+        <p>See what people nearby are listening to. Anonymous, ambient and built for small moments of connection.</p>
+      </div>
+      <div class="ob-actions">
+        <button class="primary" id="startOnboarding">Start exploring</button>
+        <p class="privacy-note">Prototype mode uses simulated nearby listeners. No real location or Spotify account is required.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="stepOverlay" class="overlay">
+    <div class="sheet">
+      <div class="handle"></div>
+      <div id="stepContent"></div>
+    </div>
+  </div>
+
+  <div id="trackOverlay" class="overlay">
+    <div class="sheet">
+      <div class="handle"></div>
+      <div class="sheet-art" id="sheetArt"><span id="sheetInitials">WF</span></div>
+      <h2 id="sheetTitle">Weird Fishes / Arpeggi</h2>
+      <div class="artist" id="sheetArtist">Radiohead</div>
+      <div class="proximity"><i></i><span id="sheetPeople">1 person nearby is listening</span></div>
+      <button class="primary" id="listenBtn">Listen on Spotify</button>
+      <button class="secondary" id="closeTrack">Not now</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">
+    <div class="toast-icon">◌</div><div><b id="toastTitle">Someone nearby picked up your song.</b><p id="toastText">Your music just travelled a little further.</p></div>
+  </div>
+
+  <main class="app">
+    <section id="pageNearby" class="page active">
+      <div class="topbar"><div><div class="logo">Echo<span>.</span></div><div class="kicker">Discover the soundtrack around you.</div></div><span class="demo-badge">Prototype</span></div>
+      <div class="orb-wrap">
+        <div class="ambient"></div>
+        <div class="orb">
+          <div class="wave w1"></div><div class="wave w2"></div>
+          <div class="orb-count"><strong id="listenerCount">14</strong><span>listeners nearby</span></div>
+        </div>
+        <span class="dot hot" style="top:48px;left:28%;animation-delay:.4s"></span>
+        <span class="dot" style="top:70px;right:23%;animation-delay:1.4s"></span>
+        <span class="dot" style="top:128px;left:11%;animation-delay:2s"></span>
+        <span class="dot hot" style="bottom:70px;right:13%;animation-delay:.9s"></span>
+        <span class="dot" style="bottom:48px;left:23%;animation-delay:2.7s"></span>
+        <span class="dot" style="top:35%;right:7%;animation-delay:1.9s"></span>
+        <span class="dot" style="top:47%;left:5%;animation-delay:3.2s"></span>
+      </div>
+
+      <div class="signal-card" id="signalCard">
+        <div class="signal-icon">≈</div><div><b>2 people nearby are on your wavelength</b><p>They've been listening to artists you play often.</p></div>
+      </div>
+
+      <div class="section">
+        <div class="section-head"><div class="section-title">Playing around you</div><div class="section-meta" id="refreshMeta">live now</div></div>
+        <div class="tracks" id="tracks"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-head"><div class="section-title">Your soundtrack</div><div class="section-meta">sharing</div></div>
+        <div class="mine">
+          <div class="art c">TD</div><div><div class="mine-label">Playing now</div><div class="track-title">Tadow</div><div class="track-artist">Masego, FKJ</div></div><button class="ghost" id="demoEcho">Try Echo</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="pageEchoes" class="page">
+      <div class="topbar"><div><div class="logo">Echoes<span style="color:var(--purple)">.</span></div><div class="kicker">Small moments your music created.</div></div></div>
+      <div class="section">
+        <div class="section-head"><div class="section-title">Today</div><div class="section-meta" id="echoCount">2 moments</div></div>
+        <div class="echo-list" id="echoList"></div>
+      </div>
+    </section>
+
+    <section id="pageSettings" class="page">
+      <div class="topbar"><div><div class="logo">Settings<span style="color:var(--purple)">.</span></div><div class="kicker">Control what you share.</div></div></div>
+      <div class="section">
+        <div class="settings-card">
+          <div class="settings-row"><div><b>Share my soundtrack</b><small>Let nearby people discover what you're hearing.</small></div><button id="shareToggle" class="toggle on" aria-label="Toggle sharing"></button></div>
+          <div class="settings-row"><div><b>Nearby presence</b><small>Prototype uses an anonymous simulated area.</small></div><span style="font-size:12px;color:#b8aec7">On</span></div>
+          <div class="settings-row"><div><b>Music service</b><small>Simulated for this prototype.</small></div><span style="font-size:12px;color:#b8aec7">Spotify</span></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">Prototype tools</div>
+        <div class="settings-card"><div class="settings-row"><div><b>Trigger an incoming Echo</b><small>Simulate someone nearby picking up your current song.</small></div><button class="ghost" id="demoEchoSettings">Run</button></div><div class="settings-row"><div><b>Replay onboarding</b><small>See the first-run experience again.</small></div><button class="ghost" id="replayOnboarding">Replay</button></div></div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="nav">
+    <button class="active" data-page="Nearby" aria-label="Nearby"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="2.5"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.8 4.8a10.2 10.2 0 0 0 0 14.4M19.2 4.8a10.2 10.2 0 0 1 0 14.4"/></svg><span>Nearby</span></button>
+    <button data-page="Echoes" aria-label="Echoes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 12a8 8 0 0 1 8-8M4 12a8 8 0 0 0 8 8M8 12a4 4 0 0 1 4-4M8 12a4 4 0 0 0 4 4M14 9.5 19 6v12l-5-3.5z"/></svg><span>Echoes</span></button>
+    <button data-page="Settings" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1A1.7 1.7 0 0 0 4.6 15 1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1z"/></svg><span>Settings</span></button>
+  </nav>
+
+<script>
+const state={onboardStep:0, sharing:true, echoEvents:[
+  {title:'Someone picked up Weird Fishes / Arpeggi', text:'18 minutes ago · nearby'},
+  {title:'Someone discovered Tadow through you', text:'1 hour ago · nearby'}
+]};
+const tracks=[
+ {title:'Delilah (pull me out of this)',artist:'Fred again..',listeners:3,art:'a',initials:'FA'},
+ {title:'CHIHIRO',artist:'Billie Eilish',listeners:2,art:'b',initials:'BE'},
+ {title:'Weird Fishes / Arpeggi',artist:'Radiohead',listeners:1,art:'c',initials:'WF'},
+ {title:'Friday Morning',artist:'Khruangbin',listeners:1,art:'d',initials:'KH'},
+];
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+function renderTracks(){ $('#tracks').innerHTML=tracks.map((t,i)=>`<div class="track" data-i="${i}"><div class="art ${t.art}">${t.initials}</div><div class="track-main"><div class="track-title">${t.title}</div><div class="track-artist">${t.artist}</div></div><div class="count">${t.listeners} ${t.listeners===1?'listener':'listeners'}</div></div>`).join(''); $$('.track').forEach(el=>el.onclick=()=>openTrack(tracks[+el.dataset.i])); }
+function renderEchoes(){ if(!state.echoEvents.length){$('#echoList').innerHTML='<div class="empty">No Echoes yet. Keep listening.</div>';return;} $('#echoList').innerHTML=state.echoEvents.map(e=>`<div class="echo-item"><div class="echo-pulse"></div><div><b>${e.title}</b><p>${e.text}</p></div></div>`).join(''); $('#echoCount').textContent=`${state.echoEvents.length} moment${state.echoEvents.length===1?'':'s'}`;}
+function openTrack(t){ $('#sheetTitle').textContent=t.title;$('#sheetArtist').textContent=t.artist;$('#sheetInitials').textContent=t.initials;$('#sheetPeople').textContent=`${t.listeners} ${t.listeners===1?'person':'people'} nearby ${t.listeners===1?'is':'are'} listening`;$('#trackOverlay').classList.add('show'); $('#listenBtn').onclick=()=>pickupTrack(t);}
+function pickupTrack(t){ window.open(`https://open.spotify.com/search/${encodeURIComponent(t.artist+' '+t.title)}`,'_blank'); $('#trackOverlay').classList.remove('show'); setTimeout(()=>showToast('You picked up a nearby song.',`${t.artist} · ${t.title}`),500);}
+function showToast(title,text){$('#toastTitle').textContent=title;$('#toastText').textContent=text;$('#toast').classList.add('show');setTimeout(()=>$('#toast').classList.remove('show'),4200)}
+function triggerIncomingEcho(){ const event={title:'Someone nearby picked up Tadow',text:'just now · nearby'}; state.echoEvents.unshift(event);renderEchoes();showToast('Someone nearby picked up your song.','Your music just travelled a little further.');}
+function onboarding(){state.onboardStep=0;$('#onboard').classList.add('show')}
+function openStep(){ const steps=[
+  {h:'Connect your music',p:'Echo reads what you are currently playing so your soundtrack can appear anonymously nearby.',b:'Connect Spotify',small:'Prototype: connection is simulated.'},
+  {h:'Share only the place, not the person',p:'Echo uses proximity to create a shared moment. Nobody sees your name, exact distance or location trail.',b:'Enable nearby',small:'Prototype: no location permission will be requested.'},
+  {h:'You are ready',p:'Listen normally. Echo does the rest — discover nearby songs and see when yours inspires somebody else.',b:'Enter Echo',small:'You can stop sharing at any time.'}
+ ]; let s=steps[state.onboardStep];$('#stepContent').innerHTML=`<h2 style="font-size:27px;letter-spacing:-.8px;margin:3px 0 8px">${s.h}</h2><p style="font-size:14px;line-height:1.55;color:var(--muted);margin:0 0 22px">${s.p}</p><button class="primary" id="stepNext">${s.b}</button><p class="privacy-note">${s.small}</p>`;$('#stepOverlay').classList.add('show');$('#stepNext').onclick=()=>{state.onboardStep++;if(state.onboardStep>=steps.length){$('#stepOverlay').classList.remove('show');localStorage.setItem('echo-onboarded','1');showToast('You are visible on Echo.','Your soundtrack is being shared anonymously.')}else openStep();};}
+$('#startOnboarding').onclick=()=>{$('#onboard').classList.remove('show');openStep()};
+$('#closeTrack').onclick=()=>$('#trackOverlay').classList.remove('show');
+$('#trackOverlay').onclick=e=>{if(e.target===$('#trackOverlay'))$('#trackOverlay').classList.remove('show')};
+$('#demoEcho').onclick=triggerIncomingEcho;$('#demoEchoSettings').onclick=triggerIncomingEcho;
+$('#replayOnboarding').onclick=()=>{localStorage.removeItem('echo-onboarded');onboarding()};
+$('#shareToggle').onclick=e=>{state.sharing=!state.sharing;e.currentTarget.classList.toggle('on',state.sharing);showToast(state.sharing?'Sharing is on.':'Sharing paused.',state.sharing?'Nearby listeners can discover your soundtrack.':'You are no longer visible nearby.');};
+$$('.nav button').forEach(b=>b.onclick=()=>{ $$('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');$$('.page').forEach(p=>p.classList.remove('active'));$('#page'+b.dataset.page).classList.add('active');window.scrollTo({top:0,behavior:'smooth'});});
+renderTracks();renderEchoes();
+if(localStorage.getItem('echo-onboarded')) $('#onboard').classList.remove('show');
+setInterval(()=>{let n=+$('#listenerCount').textContent; n=Math.max(9,Math.min(19,n+(Math.random()>.55?1:-1))); $('#listenerCount').textContent=n; $('#refreshMeta').textContent=Math.random()>.5?'live now':'updated just now';},6500);
+</script>
+</body>
+</html>
