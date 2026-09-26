@@ -27,18 +27,27 @@
     .section-head{display:flex;align-items:end;justify-content:space-between;margin-bottom:12px}
     .section-title{font-size:18px;font-weight:700;letter-spacing:-.3px}.section-meta{font-size:12px;color:var(--muted)}
 
-    .orb-wrap{height:318px;display:grid;place-items:center;position:relative;overflow:hidden;margin-top:4px}
-    .ambient{position:absolute;width:330px;height:330px;border-radius:50%;background:radial-gradient(circle,rgba(168,121,255,.14),rgba(104,229,255,.035) 48%,transparent 70%);filter:blur(7px);animation:pulse 6s ease-in-out infinite}
-    .orb{width:208px;height:208px;border-radius:50%;position:relative;display:grid;place-items:center;background:linear-gradient(145deg,rgba(168,121,255,.19),rgba(23,19,34,.82) 42%,rgba(104,229,255,.12));border:1px solid rgba(255,255,255,.12);box-shadow:inset 0 0 45px rgba(168,121,255,.12),0 0 65px rgba(111,92,255,.12);overflow:hidden}
+    .orb-wrap{height:330px;display:grid;place-items:center;position:relative;overflow:hidden;margin-top:4px}
+    .ambient{position:absolute;width:350px;height:350px;border-radius:50%;background:radial-gradient(circle,rgba(168,121,255,.16),rgba(104,229,255,.045) 48%,transparent 70%);filter:blur(7px);animation:pulse 4.8s ease-in-out infinite}
+    .orb{width:208px;height:208px;border-radius:50%;position:relative;display:grid;place-items:center;background:linear-gradient(145deg,rgba(168,121,255,.19),rgba(23,19,34,.82) 42%,rgba(104,229,255,.12));border:1px solid rgba(255,255,255,.12);box-shadow:inset 0 0 45px rgba(168,121,255,.12),0 0 65px rgba(111,92,255,.12);overflow:hidden;animation:orbBreathe 5.4s ease-in-out infinite}
+    .orb::before{content:"";position:absolute;inset:-28%;border-radius:44%;background:conic-gradient(from 30deg,transparent,rgba(168,121,255,.08),transparent 34%,rgba(104,229,255,.065),transparent 72%);animation:orbTurn 13s linear infinite}
     .orb::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(120deg,rgba(255,255,255,.09),transparent 30%,transparent 70%,rgba(104,229,255,.05));pointer-events:none}
-    .wave{position:absolute;left:-24px;width:260px;height:62px;border-radius:48%;border-top:2px solid rgba(168,121,255,.55);transform:rotate(-5deg);animation:wave 5s linear infinite}
-    .wave.w1{top:72px}.wave.w2{top:112px;animation-duration:7s;animation-direction:reverse;border-color:rgba(104,229,255,.42);transform:rotate(7deg)}
-    .orb-count{position:relative;z-index:2;text-align:center;margin-top:4px}.orb-count strong{display:block;font-size:52px;line-height:.95;letter-spacing:-2.6px}.orb-count span{display:block;color:#d7d0e5;font-size:13px;margin-top:7px}
-    .dot{position:absolute;width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.78);box-shadow:0 0 12px rgba(255,255,255,.3);animation:float 5s ease-in-out infinite}
-    .dot.hot{background:var(--purple);box-shadow:0 0 14px rgba(168,121,255,.6);width:9px;height:9px}
-    @keyframes pulse{0%,100%{transform:scale(.95);opacity:.8}50%{transform:scale(1.06);opacity:1}}
-    @keyframes wave{0%{transform:translateX(-12px) rotate(-5deg)}50%{transform:translateX(12px) rotate(2deg)}100%{transform:translateX(-12px) rotate(-5deg)}}
-    @keyframes float{0%,100%{transform:translateY(0) scale(1);opacity:.65}50%{transform:translateY(-7px) scale(1.08);opacity:1}}
+    .wave{position:absolute;left:-44px;width:296px;height:84px;border-radius:46%;border-top:2px solid rgba(168,121,255,.58);filter:drop-shadow(0 0 8px rgba(168,121,255,.24));opacity:.82;animation:waveFlow 4.2s ease-in-out infinite}
+    .wave.w1{top:48px}
+    .wave.w2{top:77px;animation-duration:5.3s;animation-direction:reverse;border-color:rgba(104,229,255,.48);filter:drop-shadow(0 0 8px rgba(104,229,255,.18))}
+    .wave.w3{top:108px;animation-duration:3.7s;animation-delay:-1.2s;border-color:rgba(197,156,255,.38);opacity:.64}
+    .wave.w4{top:138px;animation-duration:6.1s;animation-direction:reverse;animation-delay:-2.4s;border-color:rgba(104,229,255,.28);opacity:.55}
+    .orb-count{position:relative;z-index:4;text-align:center;margin-top:4px;text-shadow:0 2px 18px rgba(11,10,16,.7)}.orb-count strong{display:block;font-size:52px;line-height:.95;letter-spacing:-2.6px}.orb-count span{display:block;color:#d7d0e5;font-size:13px;margin-top:7px}
+    .listener-dots{position:absolute;inset:0;pointer-events:none;z-index:5}
+    .listener-dot{position:absolute;left:var(--x);top:var(--y);width:var(--size);height:var(--size);border-radius:50%;background:rgba(255,255,255,.78);box-shadow:0 0 12px rgba(255,255,255,.28);animation:dotDrift var(--dur) ease-in-out infinite alternate;animation-delay:var(--delay);transition:opacity .35s ease,filter .35s ease}
+    .listener-dot.hot{background:var(--purple);box-shadow:0 0 15px rgba(168,121,255,.7)}
+    .listener-dot.cool{background:rgba(104,229,255,.84);box-shadow:0 0 15px rgba(104,229,255,.46)}
+    @keyframes pulse{0%,100%{transform:scale(.94);opacity:.76}50%{transform:scale(1.08);opacity:1}}
+    @keyframes orbBreathe{0%,100%{transform:scale(.985)}50%{transform:scale(1.018)}}
+    @keyframes orbTurn{to{transform:rotate(360deg)}}
+    @keyframes waveFlow{0%{transform:translateX(-18px) translateY(1px) rotate(-6deg) scaleX(.96)}35%{transform:translateX(10px) translateY(-7px) rotate(1deg) scaleX(1.04)}70%{transform:translateX(19px) translateY(5px) rotate(5deg) scaleX(.98)}100%{transform:translateX(-18px) translateY(1px) rotate(-6deg) scaleX(.96)}}
+    @keyframes dotDrift{0%{transform:translate(calc(-50% + var(--dx1)),calc(-50% + var(--dy1))) scale(.78);opacity:.48}38%{transform:translate(calc(-50% + var(--dx2)),calc(-50% + var(--dy2))) scale(1.1);opacity:1}72%{transform:translate(calc(-50% + var(--dx3)),calc(-50% + var(--dy3))) scale(.9);opacity:.68}100%{transform:translate(calc(-50% + var(--dx4)),calc(-50% + var(--dy4))) scale(1.04);opacity:.92}}
+    @media (prefers-reduced-motion:reduce){.ambient,.orb,.orb::before,.wave,.listener-dot{animation-duration:18s!important}}
 
     .signal-card{display:flex;gap:12px;align-items:center;background:linear-gradient(110deg,rgba(168,121,255,.16),rgba(104,229,255,.07));border:1px solid rgba(168,121,255,.24);border-radius:18px;padding:13px 14px;box-shadow:var(--shadow)}
     .signal-icon{width:39px;height:39px;border-radius:13px;background:rgba(168,121,255,.17);display:grid;place-items:center;color:#d9c6ff;font-size:19px;flex:0 0 auto}
@@ -123,16 +132,10 @@
       <div class="orb-wrap">
         <div class="ambient"></div>
         <div class="orb">
-          <div class="wave w1"></div><div class="wave w2"></div>
+          <div class="wave w1"></div><div class="wave w2"></div><div class="wave w3"></div><div class="wave w4"></div>
           <div class="orb-count"><strong id="listenerCount">14</strong><span>listeners nearby</span></div>
         </div>
-        <span class="dot hot" style="top:48px;left:28%;animation-delay:.4s"></span>
-        <span class="dot" style="top:70px;right:23%;animation-delay:1.4s"></span>
-        <span class="dot" style="top:128px;left:11%;animation-delay:2s"></span>
-        <span class="dot hot" style="bottom:70px;right:13%;animation-delay:.9s"></span>
-        <span class="dot" style="bottom:48px;left:23%;animation-delay:2.7s"></span>
-        <span class="dot" style="top:35%;right:7%;animation-delay:1.9s"></span>
-        <span class="dot" style="top:47%;left:5%;animation-delay:3.2s"></span>
+        <div class="listener-dots" id="listenerDots" aria-hidden="true"></div>
       </div>
 
       <div class="signal-card" id="signalCard">
@@ -216,9 +219,27 @@ $('#demoEcho').onclick=triggerIncomingEcho;$('#demoEchoSettings').onclick=trigge
 $('#replayOnboarding').onclick=()=>{storageRemove('echo-onboarded');onboarding()};
 $('#shareToggle').onclick=e=>{state.sharing=!state.sharing;e.currentTarget.classList.toggle('on',state.sharing);showToast(state.sharing?'Sharing is on.':'Sharing paused.',state.sharing?'Nearby listeners can discover your soundtrack.':'You are no longer visible nearby.');};
 $$('.nav button').forEach(b=>b.onclick=()=>{ $$('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');$$('.page').forEach(p=>p.classList.remove('active'));$('#page'+b.dataset.page).classList.add('active');window.scrollTo({top:0,behavior:'smooth'});});
-renderTracks();renderEchoes();
+const DOT_CAP=29;
+function seededUnit(i,salt=0){const x=Math.sin((i+1)*12.9898+(salt+1)*78.233)*43758.5453;return x-Math.floor(x)}
+function renderListenerDots(count){
+  const dots=Math.min(count,DOT_CAP), host=$('#listenerDots');
+  host.innerHTML=Array.from({length:dots},(_,i)=>{
+    const angle=(Math.PI*2*i/Math.max(dots,1))+(seededUnit(i,1)-.5)*.38;
+    const radius=119+seededUnit(i,2)*36;
+    const x=50+Math.cos(angle)*radius/3.3;
+    const y=50+Math.sin(angle)*radius/3.3;
+    const size=(5.5+seededUnit(i,3)*4.5).toFixed(1)+'px';
+    const dur=(3.2+seededUnit(i,4)*4.5).toFixed(2)+'s';
+    const delay=(-seededUnit(i,5)*5).toFixed(2)+'s';
+    const drift=()=>((seededUnit(i,Math.floor(Math.random()*20)+6)-.5)*18).toFixed(1)+'px';
+    const tone=i%7===0?' hot':(i%9===0?' cool':'');
+    return `<span class="listener-dot${tone}" style="--x:${x.toFixed(2)}%;--y:${y.toFixed(2)}%;--size:${size};--dur:${dur};--delay:${delay};--dx1:${drift()};--dy1:${drift()};--dx2:${drift()};--dy2:${drift()};--dx3:${drift()};--dy3:${drift()};--dx4:${drift()};--dy4:${drift()}"></span>`
+  }).join('');
+}
+function setListenerCount(n){$('#listenerCount').textContent=n;renderListenerDots(n)}
+renderTracks();renderEchoes();setListenerCount(+$('#listenerCount').textContent);
 if(storageGet('echo-onboarded')) $('#onboard').classList.remove('show');
-setInterval(()=>{let n=+$('#listenerCount').textContent; n=Math.max(9,Math.min(19,n+(Math.random()>.55?1:-1))); $('#listenerCount').textContent=n; $('#refreshMeta').textContent=Math.random()>.5?'live now':'updated just now';},6500);
+setInterval(()=>{let n=+$('#listenerCount').textContent; n=Math.max(9,Math.min(33,n+(Math.random()>.57?1:-1))); setListenerCount(n); $('#refreshMeta').textContent=Math.random()>.5?'live now':'updated just now';},5200);
 </script>
 </body>
 </html>
