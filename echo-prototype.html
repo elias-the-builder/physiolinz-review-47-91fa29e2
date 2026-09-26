@@ -194,6 +194,9 @@ const tracks=[
  {title:'Friday Morning',artist:'Khruangbin',listeners:1,art:'d',initials:'KH'},
 ];
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+function storageGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function storageSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+function storageRemove(k){try{localStorage.removeItem(k)}catch(e){}}
 function renderTracks(){ $('#tracks').innerHTML=tracks.map((t,i)=>`<div class="track" data-i="${i}"><div class="art ${t.art}">${t.initials}</div><div class="track-main"><div class="track-title">${t.title}</div><div class="track-artist">${t.artist}</div></div><div class="count">${t.listeners} ${t.listeners===1?'listener':'listeners'}</div></div>`).join(''); $$('.track').forEach(el=>el.onclick=()=>openTrack(tracks[+el.dataset.i])); }
 function renderEchoes(){ if(!state.echoEvents.length){$('#echoList').innerHTML='<div class="empty">No Echoes yet. Keep listening.</div>';return;} $('#echoList').innerHTML=state.echoEvents.map(e=>`<div class="echo-item"><div class="echo-pulse"></div><div><b>${e.title}</b><p>${e.text}</p></div></div>`).join(''); $('#echoCount').textContent=`${state.echoEvents.length} moment${state.echoEvents.length===1?'':'s'}`;}
 function openTrack(t){ $('#sheetTitle').textContent=t.title;$('#sheetArtist').textContent=t.artist;$('#sheetInitials').textContent=t.initials;$('#sheetPeople').textContent=`${t.listeners} ${t.listeners===1?'person':'people'} nearby ${t.listeners===1?'is':'are'} listening`;$('#trackOverlay').classList.add('show'); $('#listenBtn').onclick=()=>pickupTrack(t);}
@@ -205,16 +208,16 @@ function openStep(){ const steps=[
   {h:'Connect your music',p:'Echo reads what you are currently playing so your soundtrack can appear anonymously nearby.',b:'Connect Spotify',small:'Prototype: connection is simulated.'},
   {h:'Share only the place, not the person',p:'Echo uses proximity to create a shared moment. Nobody sees your name, exact distance or location trail.',b:'Enable nearby',small:'Prototype: no location permission will be requested.'},
   {h:'You are ready',p:'Listen normally. Echo does the rest — discover nearby songs and see when yours inspires somebody else.',b:'Enter Echo',small:'You can stop sharing at any time.'}
- ]; let s=steps[state.onboardStep];$('#stepContent').innerHTML=`<h2 style="font-size:27px;letter-spacing:-.8px;margin:3px 0 8px">${s.h}</h2><p style="font-size:14px;line-height:1.55;color:var(--muted);margin:0 0 22px">${s.p}</p><button class="primary" id="stepNext">${s.b}</button><p class="privacy-note">${s.small}</p>`;$('#stepOverlay').classList.add('show');$('#stepNext').onclick=()=>{state.onboardStep++;if(state.onboardStep>=steps.length){$('#stepOverlay').classList.remove('show');localStorage.setItem('echo-onboarded','1');showToast('You are visible on Echo.','Your soundtrack is being shared anonymously.')}else openStep();};}
+ ]; let s=steps[state.onboardStep];$('#stepContent').innerHTML=`<h2 style="font-size:27px;letter-spacing:-.8px;margin:3px 0 8px">${s.h}</h2><p style="font-size:14px;line-height:1.55;color:var(--muted);margin:0 0 22px">${s.p}</p><button class="primary" id="stepNext">${s.b}</button><p class="privacy-note">${s.small}</p>`;$('#stepOverlay').classList.add('show');$('#stepNext').onclick=()=>{state.onboardStep++;if(state.onboardStep>=steps.length){$('#stepOverlay').classList.remove('show');storageSet('echo-onboarded','1');showToast('You are visible on Echo.','Your soundtrack is being shared anonymously.')}else openStep();};}
 $('#startOnboarding').onclick=()=>{$('#onboard').classList.remove('show');openStep()};
 $('#closeTrack').onclick=()=>$('#trackOverlay').classList.remove('show');
 $('#trackOverlay').onclick=e=>{if(e.target===$('#trackOverlay'))$('#trackOverlay').classList.remove('show')};
 $('#demoEcho').onclick=triggerIncomingEcho;$('#demoEchoSettings').onclick=triggerIncomingEcho;
-$('#replayOnboarding').onclick=()=>{localStorage.removeItem('echo-onboarded');onboarding()};
+$('#replayOnboarding').onclick=()=>{storageRemove('echo-onboarded');onboarding()};
 $('#shareToggle').onclick=e=>{state.sharing=!state.sharing;e.currentTarget.classList.toggle('on',state.sharing);showToast(state.sharing?'Sharing is on.':'Sharing paused.',state.sharing?'Nearby listeners can discover your soundtrack.':'You are no longer visible nearby.');};
 $$('.nav button').forEach(b=>b.onclick=()=>{ $$('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');$$('.page').forEach(p=>p.classList.remove('active'));$('#page'+b.dataset.page).classList.add('active');window.scrollTo({top:0,behavior:'smooth'});});
 renderTracks();renderEchoes();
-if(localStorage.getItem('echo-onboarded')) $('#onboard').classList.remove('show');
+if(storageGet('echo-onboarded')) $('#onboard').classList.remove('show');
 setInterval(()=>{let n=+$('#listenerCount').textContent; n=Math.max(9,Math.min(19,n+(Math.random()>.55?1:-1))); $('#listenerCount').textContent=n; $('#refreshMeta').textContent=Math.random()>.5?'live now':'updated just now';},6500);
 </script>
 </body>
